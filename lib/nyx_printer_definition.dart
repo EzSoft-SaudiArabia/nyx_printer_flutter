@@ -92,16 +92,17 @@ class PrintTextStyle {
   /// font file path for custom font
   String? font;
 
-  PrintTextStyle({this.textSize = 24,
-    this.underline = false,
-    this.textScaleX = 1.0,
-    this.textScaleY = 1.0,
-    this.letterSpacing = 0,
-    this.lineSpacing = 0,
-    this.topPadding = 0,
-    this.leftPadding = 0,
-    this.align = PrintAlign.LEFT,
-    this.font});
+  PrintTextStyle(
+      {this.textSize = 24,
+      this.underline = false,
+      this.textScaleX = 1.0,
+      this.textScaleY = 1.0,
+      this.letterSpacing = 0,
+      this.lineSpacing = 0,
+      this.topPadding = 0,
+      this.leftPadding = 0,
+      this.align = PrintAlign.LEFT,
+      this.font});
 
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> map = <String, dynamic>{};
@@ -130,6 +131,18 @@ enum BarcodeTextPosition {
   TEXT_ABOVE,
   TEXT_BELOW,
   BOTH,
+}
+
+enum BarcodeSymbology {
+  CODE128,
+  CODE39,
+  CODE93,
+  UPCA,
+  UPCE,
+  EAN13,
+  EAN8,
+  ITF,
+  CODABAR,
 }
 
 enum ImageType {

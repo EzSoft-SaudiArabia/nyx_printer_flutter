@@ -34,7 +34,19 @@ abstract class NyxPrinterPlatform extends PlatformInterface {
     throw UnimplementedError('getPrinterVersion() has not been implemented.');
   }
 
-  Future<int?> getPrinterStatus() {
+  Future<int?> getPrinterStatus() async {
+    throw UnimplementedError('getPrinterStatus() has not been implemented.');
+  }
+
+  Future<int?> getPrinterDensity() async {
+    throw UnimplementedError('getPrinterStatus() has not been implemented.');
+  }
+
+  Future<void> setPrinterDensity(int density) async {
+    throw UnimplementedError('getPrinterStatus() has not been implemented.');
+  }
+
+  Future<void> setPaperWidth(int width) async {
     throw UnimplementedError('getPrinterStatus() has not been implemented.');
   }
 
@@ -53,7 +65,8 @@ abstract class NyxPrinterPlatform extends PlatformInterface {
 
   Future<void> printBarcode(String data, int width, int height,
       {BarcodeTextPosition textPosition = BarcodeTextPosition.NO_TEXT,
-      PrintAlign align = PrintAlign.LEFT}) {
+      PrintAlign align = PrintAlign.LEFT,
+      BarcodeSymbology symbology = BarcodeSymbology.CODE128}) async {
     throw UnimplementedError('printBarcode() has not been implemented.');
   }
 
@@ -72,7 +85,7 @@ abstract class NyxPrinterPlatform extends PlatformInterface {
     throw UnimplementedError('printRasterData() has not been implemented.');
   }
 
-  Future<void> printEscposData(Uint8List data) {
+  Future<Uint8List?> printEscposData(Uint8List data) {
     throw UnimplementedError('printEscposData() has not been implemented.');
   }
 
@@ -93,7 +106,7 @@ abstract class NyxPrinterPlatform extends PlatformInterface {
     throw UnimplementedError('labelPrintEnd() has not been implemented.');
   }
 
-  Future<void> labelLocateAuto() {
+  Future<void> labelLocateAuto({int labelHeight = 0, int labelGap = 0}) {
     throw UnimplementedError('labelLocateAuto() has not been implemented.');
   }
 
@@ -114,6 +127,10 @@ abstract class NyxPrinterPlatform extends PlatformInterface {
   }
 
   Future<void> showLcdImage(Uint8List img) {
+    throw UnimplementedError('showLcdBitmap() has not been implemented.');
+  }
+
+  Future<void> setLcdLogo(Uint8List img) {
     throw UnimplementedError('showLcdBitmap() has not been implemented.');
   }
 

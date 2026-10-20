@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:nyx_printer_flutter/nyx_printer.dart';
@@ -111,6 +113,59 @@ class _MyAppState extends State<MyApp> {
     setState(() {});
   }
 
+  _printEscpos() async {
+    try {
+      await NyxPrinter.printEscposData(Uint8List.fromList([0x1b, 0x40]));
+      var ret = await NyxPrinter.printEscposData(
+          Uint8List.fromList([0x1d, 0x72, 0x01]));
+      _log += "printer status from ESC/POS cmd: $ret\n";
+      await NyxPrinter.printEscposData(
+          Uint8List.fromList([0x1b, 0x61, 0x01, 0x1b, 0x21, 48]));
+      await NyxPrinter.printEscposData(
+          Uint8List.fromList(utf8.encode("Receipt\n")));
+      await NyxPrinter.printEscposData(
+          Uint8List.fromList([0x1b, 0x61, 0x00, 0x1b, 0x21, 0x00]));
+      await NyxPrinter.printEscposData(Uint8List.fromList(utf8.encode("\n")));
+      await NyxPrinter.printEscposData(printTwoColumn(
+          "Order:", DateTime.now().millisecondsSinceEpoch.toString()));
+      await NyxPrinter.printEscposData(
+          printTwoColumn("Time:", "2024-12-12 12:12:12"));
+      await NyxPrinter.printEscposData(Uint8List.fromList(
+          utf8.encode("--------------------------------\n")));
+      await NyxPrinter.printEscposData(printTwoColumn("phone", "4999.00"));
+      await NyxPrinter.printEscposData(printTwoColumn("laptop", "4999.00"));
+      await NyxPrinter.printEscposData(Uint8List.fromList(
+          utf8.encode("--------------------------------\n")));
+      await NyxPrinter.printEscposData(printTwoColumn("Total:", "9998.00"));
+      await NyxPrinter.printEscposData(printTwoColumn("Cash:", "10000.00"));
+      await NyxPrinter.printEscposData(printTwoColumn("Change:", "22.00"));
+      await NyxPrinter.printEscposData(
+          Uint8List.fromList([0x1d, 0x56, 0x42, 0x00]));
+    } on PlatformException catch (e) {
+      _log += "printTest error: $e\n";
+    }
+    setState(() {});
+  }
+
+  Uint8List setPosition(int offset) {
+    return Uint8List.fromList([
+      0x1B, // ESC
+      0x24, // $
+      offset % 256, // nL
+      offset ~/ 256, // nH (整除)
+    ]);
+  }
+
+  Uint8List printTwoColumn(String title, String content) {
+    final bytesBuilder = BytesBuilder();
+    bytesBuilder.add(utf8.encode(title));
+    final offset = 384 - content.length * 12;
+    bytesBuilder.add(setPosition(offset));
+    bytesBuilder.add(utf8.encode(content));
+    bytesBuilder.addByte(0x0A); // \n
+    return bytesBuilder.toBytes();
+  }
+
   _showLcdImage() async {
     try {
       var bytes = await loadAssetsImage('images/qrcode.png');
@@ -183,6 +238,12 @@ class _MyAppState extends State<MyApp> {
                   child: ElevatedButton(
                     child: const Text('Printer Test'),
                     onPressed: () => _printTest(),
+                  )),
+              SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    child: const Text('Printer ESC/POS'),
+                    onPressed: () => _printEscpos(),
                   )),
               Row(
                 children: [

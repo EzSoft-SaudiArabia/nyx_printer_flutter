@@ -26,6 +26,23 @@ class MethodChannelNyxPrinter extends NyxPrinterPlatform {
   }
 
   @override
+  Future<int?> getPrinterDensity() async {
+    return await methodChannel.invokeMethod<int>('getPrinterDensity');
+  }
+
+  @override
+  Future<void> setPrinterDensity(int density) async {
+    return await methodChannel
+        .invokeMethod<void>('setPrinterDensity', {'density': density});
+  }
+
+  @override
+  Future<void> setPaperWidth(int width) async {
+    return await methodChannel
+        .invokeMethod<void>('setPaperWidth', {'width': width});
+  }
+
+  @override
   Future<void> paperOut(int px) async {
     return await methodChannel.invokeMethod<void>('paperOut', {'px': px});
   }
@@ -50,13 +67,15 @@ class MethodChannelNyxPrinter extends NyxPrinterPlatform {
   @override
   Future<void> printBarcode(String data, int width, int height,
       {BarcodeTextPosition textPosition = BarcodeTextPosition.NO_TEXT,
-      PrintAlign align = PrintAlign.LEFT}) async {
+      PrintAlign align = PrintAlign.LEFT,
+      BarcodeSymbology symbology = BarcodeSymbology.CODE128}) async {
     Map<String, dynamic> args = <String, dynamic>{
       'data': data,
       'width': width,
       'height': height,
       'textPosition': textPosition.index,
       'align': align.index,
+      'symbology': symbology.index,
     };
     return await methodChannel.invokeMethod<void>('printBarcode', args);
   }
@@ -92,9 +111,9 @@ class MethodChannelNyxPrinter extends NyxPrinterPlatform {
   }
 
   @override
-  Future<void> printEscposData(Uint8List data) async {
+  Future<Uint8List?> printEscposData(Uint8List data) async {
     return await methodChannel
-        .invokeMethod<void>('printEscposData', {'data': data});
+        .invokeMethod<Uint8List>('printEscposData', {'data': data});
   }
 
   @override
@@ -128,8 +147,12 @@ class MethodChannelNyxPrinter extends NyxPrinterPlatform {
   }
 
   @override
-  Future<void> labelLocateAuto() async {
-    return await methodChannel.invokeMethod<void>('labelLocateAuto');
+  Future<void> labelLocateAuto({int labelHeight = 0, int labelGap = 0}) async {
+    Map<String, dynamic> args = <String, dynamic>{
+      'labelHeight': labelHeight,
+      'labelGap': labelGap,
+    };
+    return await methodChannel.invokeMethod<void>('labelLocateAuto', args);
   }
 
   @override
@@ -157,6 +180,11 @@ class MethodChannelNyxPrinter extends NyxPrinterPlatform {
   Future<void> showLcdImage(Uint8List img) async {
     return await methodChannel
         .invokeMethod<void>('showLcdBitmap', {'img': img});
+  }
+
+  @override
+  Future<void> setLcdLogo(Uint8List img) async {
+    return await methodChannel.invokeMethod<void>('setLcdLogo', {'img': img});
   }
 
   @override

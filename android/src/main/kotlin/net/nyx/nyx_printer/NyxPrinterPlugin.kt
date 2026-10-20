@@ -149,7 +149,15 @@ class NyxPrinterPlugin : FlutterPlugin, MethodCallHandler {
                 val height = call.argument<Int>("height")!!
                 val textPosition = call.argument<Int>("textPosition")!!
                 val align = call.argument<Int>("align")!!
-                val ret = printerService?.printBarcode(data, width, height, textPosition, align)
+                val symbology = call.argument<Int>("symbology")!!
+                val ret = printerService?.printBarcode(
+                    data,
+                    width,
+                    height,
+                    textPosition,
+                    align,
+                    symbology
+                )
                 handleResult(ret, result)
             } else if (call.method == "printQrCode") {
                 val data = call.argument<String>("data")!!
@@ -174,7 +182,9 @@ class NyxPrinterPlugin : FlutterPlugin, MethodCallHandler {
                 val ret = printerService?.labelPrintEnd()
                 handleResult(ret, result)
             } else if (call.method == "labelLocateAuto") {
-                val ret = printerService?.labelLocateAuto()
+                val labelHeight = call.argument<Int>("labelHeight")!!
+                val labelGap = call.argument<Int>("labelGap")!!
+                val ret = printerService?.labelLocateAuto(labelHeight, labelGap)
                 handleResult(ret, result)
             } else if (call.method == "labelDetectAuto") {
                 val ret = printerService?.labelDetectAuto()
@@ -192,7 +202,7 @@ class NyxPrinterPlugin : FlutterPlugin, MethodCallHandler {
             } else if (call.method == "printEscposData") {
                 val data = call.argument<ByteArray>("data")
                 val ret = printerService?.printEscposData(data)
-                handleResult(ret, result)
+                result.success(ret)
             } else if (call.method == "printTableText") {
                 val texts = call.argument<List<String>>("texts")!!.toTypedArray()
                 val weights = call.argument<List<Int>>("weights")!!.toTypedArray()
@@ -215,6 +225,27 @@ class NyxPrinterPlugin : FlutterPlugin, MethodCallHandler {
             } else if (call.method == "openCashBox") {
                 val ret = printerService?.openCashBox()
                 handleResult(ret, result)
+            } else if (call.method == "triggerQscScan") {
+                val opt = call.argument<Int>("opt")!!
+                val ret = printerService?.triggerQscScan(opt)
+                handleResult(ret, result)
+            } else if (call.method == "setLcdLogo") {
+                val img = call.argument<ByteArray>("img")
+                val bitmap = BitmapFactory.decodeStream(ByteArrayInputStream(img))
+                val ret = printerService?.setLcdLogo(bitmap)
+                handleResult(ret, result)
+            } else if (call.method == "getPrinterDensity") {
+                val res = IntArray(1)
+                val ret = printerService?.getPrinterDensity(res)
+                handleResult(ret, result, res[0])
+            } else if (call.method == "setPrinterDensity") {
+                val p = call.argument<Int>("density")!!
+                val ret = printerService?.setPrinterDensity(p)
+                handleResult(ret, result)
+            } else if (call.method == "setPaperWidth") {
+                val p = call.argument<Int>("width")!!
+                val ret = printerService?.setPaperWidth(p)
+                handleResult(ret, result)
             } else {
                 result.notImplemented()
             }
@@ -223,9 +254,9 @@ class NyxPrinterPlugin : FlutterPlugin, MethodCallHandler {
         }
     }
 
-    private fun handleResult(ret: Int?, result: Result) {
+    private fun handleResult(ret: Int?, result: Result, data: Any? = null) {
         if (ret == 0) {
-            result.success(null)
+            result.success(data)
         } else {
             result.error(ret.toString(), msg(ret), null)
         }
